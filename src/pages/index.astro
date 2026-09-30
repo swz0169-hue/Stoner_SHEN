@@ -1,48 +1,204 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+
+// 最新文章：过滤草稿，按日期倒序，取前 5 篇
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 5);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			.hero {
+				padding: 2em 0 2.5em;
+				border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+			}
+			.hero h1 {
+				margin: 0 0 0.3em;
+				font-size: 2.4em;
+			}
+			.tagline {
+				font-size: 1.25em;
+				color: rgb(var(--gray-dark, 60, 60, 60));
+				margin: 0 0 1em;
+			}
+			.intro {
+				max-width: 40em;
+				line-height: 1.9;
+				margin: 0 0 1.5em;
+			}
+			.buttons {
+				display: flex;
+				gap: 0.8em;
+				flex-wrap: wrap;
+			}
+			.btn {
+				display: inline-block;
+				padding: 0.6em 1.4em;
+				border-radius: 6px;
+				text-decoration: none;
+				border: 1px solid var(--accent, #2337ff);
+				color: var(--accent, #2337ff);
+			}
+			.btn.primary {
+				background: var(--accent, #2337ff);
+				color: #fff;
+			}
+			section {
+				margin-top: 2.5em;
+			}
+			section h2 {
+				margin: 0 0 0.8em;
+				font-size: 1.4em;
+			}
+			.cards {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+				gap: 1em;
+			}
+			.card {
+				display: block;
+				padding: 1.1em 1.2em;
+				border: 1px solid rgba(128, 128, 128, 0.3);
+				border-radius: 8px;
+				text-decoration: none;
+				color: inherit;
+			}
+			.card:hover {
+				border-color: var(--accent, #2337ff);
+			}
+			.card h3 {
+				margin: 0 0 0.4em;
+				font-size: 1.1em;
+			}
+			.card p {
+				margin: 0;
+				font-size: 0.92em;
+				line-height: 1.7;
+				color: rgb(var(--gray, 96, 115, 159));
+			}
+			.post-list {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			.post-list li {
+				display: flex;
+				justify-content: space-between;
+				gap: 1em;
+				padding: 0.7em 0;
+				border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+			}
+			.post-list a {
+				text-decoration: none;
+			}
+			.post-list a:hover {
+				text-decoration: underline;
+			}
+			.post-list .date {
+				flex-shrink: 0;
+				font-size: 0.9em;
+				color: rgb(var(--gray, 96, 115, 159));
+			}
+			.more {
+				display: inline-block;
+				margin-top: 0.8em;
+			}
+			.subscribe {
+				padding: 1.3em 1.4em;
+				border-radius: 8px;
+				background: rgba(128, 128, 128, 0.1);
+				line-height: 1.9;
+			}
+			@media (max-width: 720px) {
+				.hero h1 {
+					font-size: 1.9em;
+				}
+				.post-list li {
+					flex-direction: column;
+					gap: 0.2em;
+				}
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your{' '}
-				<code>astro.config.mjs</code> file. You can customize your setup with{' '}
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to{' '}
-				<a href="https://docs.astro.build/">read the docs</a>{' '}
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out{' '}
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>{' '}
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+			<!-- 一、首屏 -->
+			<div class="hero">
+				<h1>Stoner Shen</h1>
+				<p class="tagline">以道御商，以商弘道</p>
+				<p class="intro">
+					我在研究经典思想与商业案例的结合，长期写作、做视频，也在打造自己的产品与工具。这里是我的思想与作品的完整档案。
+				</p>
+				<div class="buttons">
+					<a class="btn primary" href="/blog/">阅读文章</a>
+					<a class="btn" href="/about/">关于我</a>
+				</div>
+			</div>
+
+			<!-- 二、栏目入口 -->
+			<section>
+				<h2>从这里开始</h2>
+				<div class="cards">
+					<a class="card" href="/blog/">
+						<h3>文章</h3>
+						<p>长期输出的思考与笔记，按主题持续更新。</p>
+					</a>
+					<!-- 案例库页面建好之后，取消下面这段的注释，并确认链接地址
+					<a class="card" href="/cases/">
+						<h3>案例库</h3>
+						<p>用同一套框架拆解的商业案例。</p>
+					</a>
+					-->
+					<a class="card" href="/about/">
+						<h3>关于</h3>
+						<p>我是谁，在做什么，我的方法与理念。</p>
+					</a>
+				</div>
+			</section>
+
+			<!-- 三、最新文章 -->
+			<section>
+				<h2>最新文章</h2>
+				{
+					posts.length > 0 ? (
+						<ul class="post-list">
+							{posts.map((post) => (
+								<li>
+									<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+									<span class="date">
+										<FormattedDate date={post.data.pubDate} />
+									</span>
+								</li>
+							))}
+						</ul>
+					) : (
+						<p>文章正在准备中，敬请期待。</p>
+					)
+				}
+				<a class="more" href="/blog/">查看全部文章 →</a>
+			</section>
+
+			<!-- 四、订阅与联系 -->
+			<section>
+				<h2>保持联系</h2>
+				<div class="subscribe">
+					关注公众号「文明像素」，第一时间收到新文章。<br />
+					合作与交流：swz0169@gmail.com
+					<!-- 有公众号二维码时，把图片放进项目的 public 文件夹，再取消下面这行的注释
+					<br /><img src="/qrcode.jpg" alt="公众号二维码" width="160" />
+					-->
+				</div>
+			</section>
 		</main>
 		<Footer />
 	</body>
